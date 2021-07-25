@@ -32,11 +32,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    wrapper:{
+    wrapper: {
         flex: 1,
         alignItems: 'center',
         justifyContent: "space-around",
-        paddingHorizontal:20
+        paddingHorizontal: 20
     },
     title: {
         fontSize: 28,
