@@ -1,3 +1,4 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react"
 import { useState } from "react";
 import { useEffect } from "react";
@@ -37,7 +38,8 @@ export function PlantSelect() {
     const [isLoading, setIsLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [isLoadAll, setIsLoadAll] = useState(false);
+
+    const navigation = useNavigation();
 
     function handleEnvironmentSelected(environment: string) {
         setEnvironmentSelected(environment);
@@ -76,6 +78,10 @@ export function PlantSelect() {
         fetchPlants();
     }
 
+    function handlePlantSelect(plant: PlantsProps) {
+        navigation.navigate('PlantSave', { plant });
+    }
+
     useEffect(() => {
         async function fetchEnviroment() {
             const { data } = await api.get("plants_environments?_sort=title&_order=asc");
@@ -105,14 +111,14 @@ export function PlantSelect() {
             </View>
 
             <View>
-                <FlatList data={enviroments} renderItem={({ item }) => (
+                <FlatList data={enviroments} keyExtractor={(item) => String(item.key)} renderItem={({ item }) => (
                     <EnviromentButton title={item.title} active={item.key === environmentSelected} onPress={() => handleEnvironmentSelected(item.key)} />
                 )} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.enviromentList} />
             </View>
 
             <View style={styles.plants}>
-                <FlatList data={plants} renderItem={({ item }) => (
-                    <PlantCardPrimary data={item} />
+                <FlatList data={filteredPlants} keyExtractor={(item) => String(item.id)} renderItem={({ item }) => (
+                    <PlantCardPrimary data={item} onPress={() => handlePlantSelect(item)} />
                 )} showsHorizontalScrollIndicator={false} numColumns={2} onEndReachedThreshold={0.1}
                     onEndReached={({ distanceFromEnd }) => handleFetchMore(distanceFromEnd)}
                     ListFooterComponent={isLoadingMore ? <ActivityIndicator color={colors.green} /> : <></>} />
@@ -128,7 +134,7 @@ const styles = StyleSheet.create({
         backgroundColor: colors.background,
     },
     header: {
-        width:"100%",
+        width: "100%",
         paddingHorizontal: 30,
     },
     title: {

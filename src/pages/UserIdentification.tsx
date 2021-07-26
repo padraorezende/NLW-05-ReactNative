@@ -1,9 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react"
 import { useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from "react-native"
+import { SafeAreaView, StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert  } from "react-native"
 import { Button } from "../components/Button";
 import colors from "../styles/colors";
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export function UserIndentification() {
     const [isFocused, setIsFoscused] = useState(false);
@@ -12,7 +13,11 @@ export function UserIndentification() {
 
     const navigation = useNavigation();
 
-    function handleSubmit(){
+    async function handleSubmit(){
+        if(!name) return Alert.alert("Me diz como chamar voce 😥");
+
+        await AsyncStorage.setItem("@plantmanager:user", name);
+
         navigation.navigate("Confirmation")
     }
 
