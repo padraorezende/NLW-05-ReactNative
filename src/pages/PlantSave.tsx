@@ -1,4 +1,4 @@
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet, Text, View, ScrollView, Image, Platform, TouchableOpacity } from "react-native"
 import { getBottomSpace } from "react-native-iphone-x-helper";
@@ -6,12 +6,12 @@ import { SvgFromUri } from 'react-native-svg'
 import waterDrop from "../assets/waterdrop.png"
 import colors from "../styles/colors";
 import fonts from "../styles/fonts";
-import { Button } from "./Button";
+import { Button } from "../components/Button";
 import DateTimePicker, {Event} from "@react-native-community/datetimepicker"
 import { useState } from "react";
 import { format, isBefore } from "date-fns";
 import { Alert } from "react-native";
-import { loadPlant, PlantProps, savePlant } from "../libs/storage";
+import { PlantProps, savePlant } from "../libs/storage";
 
 interface Params {
     plant: PlantProps;
@@ -20,6 +20,7 @@ interface Params {
 export function PlantSave() {
     const [selectedDateTime, setSelectedDateTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(Platform.OS == 'ios');
+    const navigation = useNavigation();
 
     const route = useRoute();
     const { plant } = route.params as Params;
@@ -46,6 +47,14 @@ export function PlantSave() {
             await savePlant({
                 ...plant,
                 dateTimeNotification: selectedDateTime
+            });
+
+            navigation.navigate("Confirmation", {
+                title: 'Tudo Certo',
+                subtitle: 'Fique tranquilo que sempre vamos lembrar voce de cuidar da sua plantinha com muito cuidado',
+                buttonTitle: 'Muito Obrigado',
+                icon: 'hug',
+                nextScreen: 'MyPlants'
             });
 
         }catch{
