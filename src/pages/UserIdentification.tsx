@@ -16,9 +16,14 @@ export function UserIndentification() {
     async function handleSubmit(){
         if(!name) return Alert.alert("Me diz como chamar voce 😥");
 
-        await AsyncStorage.setItem("@plantmanager:user", name);
-
-        navigation.navigate("Confirmation")
+        
+        try{
+            await AsyncStorage.setItem("@plantmanager:user", name);
+            navigation.navigate("Confirmation");
+        }catch{
+            Alert.alert("Nao foi possivel salvar o seu nome 😥");
+        }
+        
     }
 
     function handleInputBlur() {

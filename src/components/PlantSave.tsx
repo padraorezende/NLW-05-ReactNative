@@ -11,20 +11,10 @@ import DateTimePicker, {Event} from "@react-native-community/datetimepicker"
 import { useState } from "react";
 import { format, isBefore } from "date-fns";
 import { Alert } from "react-native";
+import { loadPlant, PlantProps, savePlant } from "../libs/storage";
 
 interface Params {
-    plant: {
-        id: string;
-        name: string;
-        about: string;
-        water_tips: string;
-        photo: string;
-        environments: [string];
-        freguency: {
-            times: number;
-            repeat_every: string;
-        }
-    }
+    plant: PlantProps;
 }
 
 export function PlantSave() {
@@ -50,6 +40,19 @@ export function PlantSave() {
     function handleOpenDateTimePickerForAndroid(){
         setShowDatePicker(oldState => !oldState);
     }
+
+    async function handleSave(){
+        try{
+            await savePlant({
+                ...plant,
+                dateTimeNotification: selectedDateTime
+            });
+
+        }catch{
+            Alert.alert('Nao foi possivel salvar 😥')
+        }
+    }
+    
 
     return (
         <View style={styles.container}>
@@ -90,7 +93,7 @@ export function PlantSave() {
                     </TouchableOpacity>
                 )}
 
-                <Button title="Cadastrar planta" onPress={() => { }} />
+                <Button title="Cadastrar planta" onPress={handleSave} />
 
             </View>
         </View>
