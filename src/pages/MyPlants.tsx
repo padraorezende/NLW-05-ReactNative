@@ -1,22 +1,48 @@
 import React from "react";
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { StyleSheet, Text, View, Image, Alert } from 'react-native'
 import colors from "../styles/colors";
 import { Header } from "../components/Header";
 import waterDrop from "../assets/waterdrop.png"
 import { FlatList } from "react-native-gesture-handler";
 import { useState } from "react";
-import { loadPlant, PlantProps } from "../libs/storage";
+import { loadPlant, PlantProps, StoragePlantProps } from "../libs/storage";
 import { useEffect } from "react";
 import { formatDistance } from "date-fns";
 import { pt } from "date-fns/locale";
 import fonts from "../styles/fonts";
 import { PlantCardSecundary } from "../components/PlantCardSecundary";
 import { Load } from "../components/Load";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function MyPlants() {
     const [myPlants, setMyPlants] = useState<PlantProps[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [nextWatered, setnextWatered] = useState<string>();
+
+    function handleRemove(plant: PlantProps){
+        Alert.alert('Remover', `Deseja remover a ${plant.name}`,[
+            {
+                text: "Nao", 
+                style: "cancel"
+            },
+            {
+                text: "Sim",
+                onPress: async () => {
+                    try{
+                        const data = await AsyncStorage.getItem('@plantmanager:plants');
+                        const plants = data ? (JSON.parse(data) as StoragePlantProps) : {};
+
+                        delete plants[plant.id];
+
+                        await AsyncStorage.setItem('@plantmanager:plants', JSON.stringify(plants));
+
+                    }catch(error){
+
+                    }
+                }
+            }
+        ])
+    }
 
     useEffect(()=>{
         async function loadStorageData() {
@@ -59,7 +85,7 @@ export function MyPlants() {
 
                 <FlatList data={myPlants} keyExtractor={(item)=> String(item.id)} 
                 renderItem={({item})=> (
-                    <PlantCardSecundary data={item}/>
+                    <PlantCardSecundary data={item} handleRemove={()=> {handleRemove(item)}}/>
                 )} 
                 showsVerticalScrollIndicator={false} contentContainerStyle={{flex: 1}}/>
             </View>
