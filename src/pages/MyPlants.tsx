@@ -11,10 +11,11 @@ import { formatDistance } from "date-fns";
 import { pt } from "date-fns/locale";
 import fonts from "../styles/fonts";
 import { PlantCardSecundary } from "../components/PlantCardSecundary";
+import { Load } from "../components/Load";
 
 export function MyPlants() {
     const [myPlants, setMyPlants] = useState<PlantProps[]>([]);
-    const [loadig, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true);
     const [nextWatered, setnextWatered] = useState<string>();
 
     useEffect(()=>{
@@ -32,13 +33,13 @@ export function MyPlants() {
             )
 
             setMyPlants(plantsStoraged);
-            setLoading(false);
+            setIsLoading(false);
         }
 
         loadStorageData();
     },[])
 
-
+    if (isLoading) return <Load/>
     return (
         <View style={styles.container}>
             <Header />
