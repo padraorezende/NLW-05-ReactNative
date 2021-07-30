@@ -1,61 +1,59 @@
 import React from "react";
-import { StyleSheet, Text, View, Image, Alert } from 'react-native'
+import { StyleSheet, Text, View, Image, Alert, ScrollView } from 'react-native'
 import colors from "../styles/colors";
 import { Header } from "../components/Header";
 import waterDrop from "../assets/waterdrop.png"
 import { FlatList } from "react-native-gesture-handler";
 import { useState } from "react";
-import { loadPlant, PlantProps, StoragePlantProps } from "../libs/storage";
+import { loadPlant, PlantProps, removePlant } from "../libs/storage";
 import { useEffect } from "react";
 import { formatDistance } from "date-fns";
 import { pt } from "date-fns/locale";
 import fonts from "../styles/fonts";
 import { PlantCardSecundary } from "../components/PlantCardSecundary";
 import { Load } from "../components/Load";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function MyPlants() {
     const [myPlants, setMyPlants] = useState<PlantProps[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [nextWatered, setnextWatered] = useState<string>();
 
-    function handleRemove(plant: PlantProps){
-        Alert.alert('Remover', `Deseja remover a ${plant.name}`,[
+    function handleRemove(plant: PlantProps) {
+        Alert.alert('Remover', `Deseja remover a ${plant.name}`, [
             {
-                text: "Nao", 
+                text: "Nao 🙏",
                 style: "cancel"
             },
             {
-                text: "Sim",
+                text: "Sim 😥",
                 onPress: async () => {
-                    try{
-                        const data = await AsyncStorage.getItem('@plantmanager:plants');
-                        const plants = data ? (JSON.parse(data) as StoragePlantProps) : {};
+                    try {
+                        await removePlant(plant.id);
 
-                        delete plants[plant.id];
+                        setMyPlants((oldData) => (
+                            oldData.filter((item) => item.id !== plant.id)
+                        ));
 
-                        await AsyncStorage.setItem('@plantmanager:plants', JSON.stringify(plants));
-
-                    }catch(error){
-
+                    } catch (error) {
+                        Alert.alert("Nao foi possivel remover! 😥")
                     }
                 }
             }
         ])
     }
 
-    useEffect(()=>{
+    useEffect(() => {
         async function loadStorageData() {
             const plantsStoraged = await loadPlant();
 
             const nextTime = formatDistance(
                 new Date(plantsStoraged[0].dateTimeNotification).getTime(),
                 new Date().getTime(),
-                {locale: pt}
+                { locale: pt }
             )
 
             setnextWatered(
-                `Não esqueça de regar a ${plantsStoraged[0].name} a ${nextTime} horas`
+                `Não esqueça de regar a ${plantsStoraged[0].name} a ${nextTime}`
             )
 
             setMyPlants(plantsStoraged);
@@ -63,15 +61,15 @@ export function MyPlants() {
         }
 
         loadStorageData();
-    },[])
+    }, [])
 
-    if (isLoading) return <Load/>
+    if (isLoading) return <Load />
     return (
         <View style={styles.container}>
             <Header />
 
             <View style={styles.spotlight}>
-                <Image source={waterDrop} style={styles.spotlightImage}/>
+                <Image source={waterDrop} style={styles.spotlightImage} />
 
                 <Text style={styles.spotlightText}>
                     {nextWatered}
@@ -80,14 +78,15 @@ export function MyPlants() {
 
             <View style={styles.plants}>
                 <Text style={styles.plantsTitle}>
-
+                    Próximas regadas
                 </Text>
-
-                <FlatList data={myPlants} keyExtractor={(item)=> String(item.id)} 
-                renderItem={({item})=> (
-                    <PlantCardSecundary data={item} handleRemove={()=> {handleRemove(item)}}/>
-                )} 
-                showsVerticalScrollIndicator={false} contentContainerStyle={{flex: 1}}/>
+              
+                <FlatList data={myPlants} keyExtractor={(item) => String(item.id)}
+                    renderItem={({ item }) => (
+                        <PlantCardSecundary data={item} handleRemove={() => { handleRemove(item) }} />
+                    )}
+                    showsVerticalScrollIndicator={false}  />
+            
             </View>
         </View>
     );
@@ -99,11 +98,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: 30,
-        paddingTop:50,
+        paddingTop: 50,
         backgroundColor: colors.background,
-        
+
     },
-    spotlight:{
+    spotlight: {
         backgroundColor: colors.blue_light,
         paddingHorizontal: 20,
         borderRadius: 20,
@@ -112,20 +111,20 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center'
     },
-    spotlightImage:{
+    spotlightImage: {
         width: 60,
         height: 60
     },
-    spotlightText:{
+    spotlightText: {
         flex: 1,
-        color:colors.blue,
-        paddingHorizontal:20,
+        color: colors.blue,
+        paddingHorizontal: 20,
     },
-    plants:{
+    plants: {
         flex: 1,
-        width: "100%"
+        width: "100%",
     },
-    plantsTitle:{
+    plantsTitle: {
         fontSize: 24,
         fontFamily: fonts.heading,
         color: colors.heading,
