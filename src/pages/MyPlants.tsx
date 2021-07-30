@@ -18,6 +18,7 @@ export function MyPlants() {
     const [isLoading, setIsLoading] = useState(true);
     const [nextWatered, setnextWatered] = useState<string>();
 
+
     function handleRemove(plant: PlantProps) {
         Alert.alert('Remover', `Deseja remover a ${plant.name}`, [
             {
@@ -46,22 +47,27 @@ export function MyPlants() {
         async function loadStorageData() {
             const plantsStoraged = await loadPlant();
 
-            const nextTime = formatDistance(
-                new Date(plantsStoraged[0].dateTimeNotification).getTime(),
-                new Date().getTime(),
-                { locale: pt }
-            )
-
-            setnextWatered(
-                `Não esqueça de regar a ${plantsStoraged[0].name} a ${nextTime}`
-            )
+            if (plantsStoraged[0]) {
+                let nextTime = formatDistance(
+                    new Date(plantsStoraged[0].dateTimeNotification).getTime(),
+                    new Date().getTime(),
+                    { locale: pt }
+                )
+                setnextWatered(
+                    `Não esqueça de regar a ${plantsStoraged[0].name} a ${nextTime}`
+                )
+            } else {
+                setnextWatered(
+                    "Você ainda não tem nenhuma plantinha 😢"
+                )
+            }
 
             setMyPlants(plantsStoraged);
             setIsLoading(false);
         }
 
         loadStorageData();
-    }, [])
+    }, [nextWatered, myPlants])
 
     if (isLoading) return <Load />
     return (
@@ -80,13 +86,13 @@ export function MyPlants() {
                 <Text style={styles.plantsTitle}>
                     Próximas regadas
                 </Text>
-              
+
                 <FlatList data={myPlants} keyExtractor={(item) => String(item.id)}
                     renderItem={({ item }) => (
                         <PlantCardSecundary data={item} handleRemove={() => { handleRemove(item) }} />
                     )}
-                    showsVerticalScrollIndicator={false}  />
-            
+                    showsVerticalScrollIndicator={false} />
+
             </View>
         </View>
     );
@@ -98,7 +104,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: 30,
-        paddingTop: 50,
         backgroundColor: colors.background,
 
     },

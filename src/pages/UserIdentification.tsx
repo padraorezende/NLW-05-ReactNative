@@ -1,10 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react"
 import { useState } from "react";
-import { SafeAreaView, StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert  } from "react-native"
+import { SafeAreaView, StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, Alert } from "react-native"
 import { Button } from "../components/Button";
 import colors from "../styles/colors";
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import fonts from "../styles/fonts";
 
 export function UserIndentification() {
     const [isFocused, setIsFoscused] = useState(false);
@@ -13,11 +14,11 @@ export function UserIndentification() {
 
     const navigation = useNavigation();
 
-    async function handleSubmit(){
-        if(!name) return Alert.alert("Me diz como chamar voce 😥");
+    async function handleSubmit() {
+        if (!name) return Alert.alert("Me diz como chamar voce 😥");
 
-        
-        try{
+
+        try {
             await AsyncStorage.setItem("@plantmanager:user", name);
             navigation.navigate("Confirmation", {
                 title: 'Prontinho',
@@ -26,10 +27,10 @@ export function UserIndentification() {
                 icon: 'smile',
                 nextScreen: 'PlantSelect'
             });
-        }catch{
+        } catch {
             Alert.alert("Nao foi possivel salvar o seu nome 😥");
         }
-        
+
     }
 
     function handleInputBlur() {
@@ -50,28 +51,28 @@ export function UserIndentification() {
         <SafeAreaView style={styles.container}>
             <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                <View style={styles.content}>
-                    <View style={styles.form}>
-                        <View style={styles.header}>
-                            <Text style={styles.emoji}>
-                                { isFilled ? "😄" : "😃"}
-                            </Text>
-                            <Text style={styles.title}>
-                                Como podemos {"\n"}
-                                chamar voce ?
-                            </Text>
+                    <View style={styles.content}>
+                        <View style={styles.form}>
+                            <View style={styles.header}>
+                                <Text style={styles.emoji}>
+                                    {isFilled ? "😄" : "😃"}
+                                </Text>
+                                <Text style={styles.title}>
+                                    Como podemos {"\n"}
+                                    chamar voce ?
+                                </Text>
+                            </View>
                             <TextInput
-                                style={[styles.input, (isFocused || isFilled) && { borderColor: colors.green }]}
+                                style={[styles.input, (isFocused || name !== '') && { borderColor: colors.green }]}
                                 placeholder="Digite um nome"
                                 onBlur={handleInputBlur}
                                 onFocus={hanldeInputFocus}
                                 onChangeText={handleInputChange} />
-                        </View>
-                        <View style={styles.footer}>
-                            <Button title="Confirmar" onPress={handleSubmit}/>
+                            <View style={[styles.footer, !name && { opacity: 0.5 }]} >
+                                <Button disabled={!name} title="Confirmar" onPress={handleSubmit} />
+                            </View>
                         </View>
                     </View>
-                </View>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
         </SafeAreaView>
@@ -112,10 +113,11 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
     title: {
-        fontSize: 24,
+        fontSize: 28,
         lineHeight: 32,
         textAlign: "center",
         color: colors.heading,
+        fontFamily: fonts.heading,
         marginTop: 20
     },
     footer: {

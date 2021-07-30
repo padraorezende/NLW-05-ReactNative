@@ -99,10 +99,10 @@ export function PlantSelect() {
                 <Text style={styles.subtitle}>voce quer colocar a sua planta?</Text>
             </View>
 
-            <View>
+            <View style={styles.enviromentList} >
                 <FlatList data={enviroments} keyExtractor={(item) => String(item.key)} renderItem={({ item }) => (
                     <EnviromentButton title={item.title} active={item.key === environmentSelected} onPress={() => handleEnvironmentSelected(item.key)} />
-                )} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.enviromentList} />
+                )} horizontal showsHorizontalScrollIndicator={false} />
             </View>
 
             <View style={styles.plants}>
@@ -142,9 +142,8 @@ const styles = StyleSheet.create({
     enviromentList: {
         height: 40,
         justifyContent: "center",
-        paddingBottom: 5,
         marginLeft: 32,
-        marginVertical: 32
+        marginVertical: 25,
     },
     plants: {
         flex: 1,
