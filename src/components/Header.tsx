@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react"
 import { Text, Image, StyleSheet, View} from "react-native"
 import colors from "../styles/colors";
 import {getStatusBarHeight} from "react-native-iphone-x-helper"
-import userImg from "../assets/Lucas.png";
+import userImg from "../assets/plantProfile.png";
 import fonts from "../styles/fonts";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
