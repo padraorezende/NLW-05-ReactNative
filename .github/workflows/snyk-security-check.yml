@@ -1,0 +1,38 @@
+name: Snyk Security Check
+
+on:
+  push:
+    branches:
+      - main  # Substitua pelo nome da sua branch principal
+
+jobs:
+  snyk-security-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Snyk CLI
+        run: npm install -g snyk  # Certifique-se de ter o Node.js instalado
+
+      - name: Run Snyk Security Check
+        run: snyk test --all-projects --json > snyk_results.json
+
+      - name: Check Snyk Results
+        run: |
+          if [ -s snyk_results.json ]; then
+            echo "::set-output name=has_vulnerabilities::true"
+          else
+            echo "::set-output name=has_vulnerabilities::false"
+          fi
+        id: check_snyk_results
+
+      - name: Create Issue if Vulnerabilities Found
+        if: steps.check_snyk_results.outputs.has_vulnerabilities == 'true'
+        uses: peter-evans/create-issue-from-file@v2
+        with:
+          title: Snyk Security Issues Found
+          content-filepath: snyk_results.json
+        env:
+          GITHUB_TOKEN: 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
